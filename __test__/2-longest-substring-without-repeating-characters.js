@@ -20,7 +20,7 @@ const lengthOfLongestSubstring = (s) => {
     length = Math.max(...[length, str.length])
   })
 
-  return str
+  return length
 }
 
 console.log(lengthOfLongestSubstring('abcabcb1234567'))
