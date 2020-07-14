@@ -142,3 +142,59 @@ function getNumArray(list) {
 ```
 
 的确不是很优雅的方式，待后面优化吧，返回过了哈哈哈
+
+## 字符串相乘
+
+没啥新的思路，本质上就是利用 **竖乘法** 加上 **两数相加原理搞的**
+
+```js
+var multiply = function(num1, num2) {
+  if (num1 === '0' || num2 === '0') return '0'
+  // 这里可以使用朴素的 99 乘法表来解决
+  // [3, 2, 1]
+  const array1 = num1.split('').map(item => item * 1).reverse()
+  // [6, 5, 4]
+  const array2 = num2.split('').map(item => item * 1).reverse()
+  // 循环相乘，即让 123 分别与 6 5 4 相乘
+  // array2 始终是长度最短的那个
+  let result = array2.map(item => {
+      let arr = []
+      // 6
+      array1.forEach(childItem => {
+          // 3 2 1
+          arr.push(childItem * item)
+      })
+      return processFinalAdd(arr)
+  })
+  console.log('result', result)
+  return processFinalAdd(result)
+}
+
+// 处理最后的加
+function processFinalAdd (array) {
+    // [738, 615, 492] => [738, 6150, 49200]
+    let result = array.map((item, index) => {
+        item += ''
+        for (let i = 0; i < index; i++) {
+            item = (item + '0')
+        }
+        return item
+    })
+    // 这里不能这么简单的做加法，应该是使用 “两字符串相加的方式”
+    return result.reduce((acc, cur) => addTwoString(acc, cur))
+}
+
+function addTwoString(acc, cur) {
+  if (!acc) return cur
+  let carry = 0
+  const array = []
+  for(let i = acc.length - 1, j = cur.length - 1; i >=0 || j >= 0 || carry !== 0; i--, j--) {
+    const x = i < 0 ? 0 : (acc.charAt(i) - '0')
+    const y = j < 0 ? 0 : (cur.charAt(j) - '0')
+    let ret = x + y + carry
+    array.push(ret % 10)
+    carry = Math.floor(ret / 10)
+  }
+  return array.reverse().join('')
+}
+```
