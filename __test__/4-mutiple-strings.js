@@ -5,53 +5,26 @@
  */
 var multiply = function(num1, num2) {
   if (num1 === '0' || num2 === '0') return '0'
-  // 这里可以使用朴素的 99 乘法表来解决
-  // [3, 2, 1]
-  const array1 = num1.split('').map(item => item * 1).reverse()
-  // [6, 5, 4]
-  const array2 = num2.split('').map(item => item * 1).reverse()
-  // 循环相乘，即让 123 分别与 6 5 4 相乘
-  // array2 始终是长度最短的那个
-  let result = array2.map(item => {
-      let arr = []
-      // 6
-      array1.forEach(childItem => {
-          // 3 2 1
-          arr.push(childItem * item)
-      })
-      return processFinalAdd(arr)
-  })
-  console.log('result', result)
-  return processFinalAdd(result)
-}
-
-// 处理最后的加
-function processFinalAdd (array) {
-    // [738, 615, 492] => [738, 6150, 49200]
-    let result = array.map((item, index) => {
-        item += ''
-        for (let i = 0; i < index; i++) {
-            item = (item + '0')
-        }
-        return item
-    })
-    // 这里不能这么简单的做加法，应该是使用 “两字符串相加的方式”
-    return result.reduce((acc, cur) => addTwoString(acc, cur))
-}
-
-function addTwoString(acc, cur) {
-  if (!acc) return cur
-  let carry = 0
-  const array = []
-  for(let i = acc.length - 1, j = cur.length - 1; i >=0 || j >= 0 || carry !== 0; i--, j--) {
-    const x = i < 0 ? 0 : (acc.charAt(i) - '0')
-    const y = j < 0 ? 0 : (cur.charAt(j) - '0')
-    let ret = x + y + carry
-    array.push(ret % 10)
-    carry = Math.floor(ret / 10)
+  const result = [...(new Array(num1.length + num2.length))].map(() => 0)
+  for(let i = num1.length - 1; i >= 0; i--) {
+    const n1 = num1.charAt(i) * 1
+    for (let j = num2.length - 1; j >= 0; j--) {
+      const n2 = num2.charAt(j) * 1
+      const sum = n1 * n2 + result[i+j+1]
+      result[i+j+1] = sum % 10
+      // 进位
+      result[i+j] += Math.floor(sum / 10)
+    }
   }
-  return array.reverse().join('')
+  // 去掉最后的 0
+  return result.filter((item, index) => {
+    return index === 0
+      ? item !== 0
+      : true
+  })
+  .join('')
 }
+
 
 console.assert(multiply('2', '3') === '6')
 console.assert(multiply('88', '99') === '8712')
